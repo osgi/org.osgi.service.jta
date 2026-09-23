@@ -1,5 +1,4 @@
 # Set javac settings from JDT prefs
--include: ${includes}/jdt.bnd, ${includes}/osgi.tck.junit-platform.bnd, ${includes}/tck.bnd, ${includes}/cmpn.bnd
 
 -conditionalpackage					= org.osgi.test.support.*
 -privatepackage						=  \
@@ -12,15 +11,16 @@ Import-Package = \
 
  Export-Package =\
 	org.osgi.test.cases.transaction.util;version=1.0
-	
--buildpath = \
-	org.osgi.test.support;version=project, \
-	org.apache.geronimo.specs.geronimo-j2ee-connector_1.5_spec;version=2.0, \
-	org.apache.geronimo.specs.geronimo-jta_1.1_spec;version=1.1.1, \
-    org.osgi.framework;maven-scope=provided;version=1.8
 
--runbundles = \
-	org.osgi.impl.bundle.transaction; version=latest
-	
--runproperties					= ${runproperties}, \
-    ${p}.waittime=30
+p: org.osgi.test.cases.transaction
+
+# Maven build: workspace includes replaced inline (from cnf/includes and build.bnd in osgi/osgi)
+# -make.maven, not -make: the key is a map entry and would displace
+# a project-level -make (webcontainer also builds .war recipes this
+# way). bnd merges all -make.* entries.
+-make.maven: (*).(jar); type=bnd; recipe="bnd/$1.bnd"
+
+testcases.junit3: ${classes;EXTENDS;junit.framework.TestCase;CONCRETE}
+testcases.junit4: ${classes;HIERARCHY_ANNOTATED;org.junit.Test;CONCRETE}
+testcases.junit5: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.annotation.Testable;CONCRETE}
+Test-Cases: ${sort;${uniq;${testcases.junit3};${testcases.junit4};${testcases.junit5}}}
