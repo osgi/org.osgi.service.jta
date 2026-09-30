@@ -54,6 +54,10 @@
 		</pluginRepository>
 	</pluginRepositories>
 
+	<properties>
+		<osgi.scm.repository>osgi/org.osgi.service.jta</osgi.scm.repository>
+	</properties>
+
 	<modules>
 		<module>spec/org.osgi.spec.service.jta</module>
 		<module>tck</module>
