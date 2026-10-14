@@ -18,6 +18,11 @@
 
 package org.osgi.test.cases.transaction;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
+
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.InvalidTransactionException;
@@ -27,6 +32,8 @@ import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.xa.XAException;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.test.cases.transaction.util.TransactionManagerFactory;
 import org.osgi.test.cases.transaction.util.XAResourceImpl;
 
@@ -40,15 +47,18 @@ import org.osgi.test.cases.transaction.util.XAResourceImpl;
 
 public class TransactionManagerTest extends TransactionTestBundleControl {
     
+    @BeforeEach
     public void setUp() throws Exception {
 		super.setUp();
         super.setUpTransactionManager();
     }
     
+    @Test
     public void testTransactionManagerFactory() {
-        assertNotNull(TransactionManagerFactory.getTransactionManager());
+        assertThat(TransactionManagerFactory.getTransactionManager()).isNotNull();
     }
 
+    @Test
     public void testTM001() throws Exception {
         try
         {
@@ -58,10 +68,11 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM003() throws Exception { 
         try
         {
@@ -72,10 +83,11 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM004() throws Exception {
         try
         {
@@ -87,34 +99,24 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM005() throws Exception {
-        try
-        {
-            tm.commit();
-            fail();
-        }
-        catch (IllegalStateException e)
-        {
-            // As expected
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            fail();
-        }
+        assertThatExceptionOfType(IllegalStateException.class)
+        		.isThrownBy(() -> tm.commit());
     }
 
+    @Test
     public void testTM006() throws Exception {
         try
         {
             tm.begin(); 
             tm.setRollbackOnly();
             tm.commit();
-            fail();
+            fail("");
         }               
         catch (RollbackException re)
         {
@@ -123,10 +125,11 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM007() throws Exception {
         try
         {
@@ -135,23 +138,17 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
 
             tx.enlistResource(new XAResourceImpl().setCommitAction(XAException.XA_RBROLLBACK));
 
-            try
-            {
-                tm.commit();
-                fail();
-            }
-            catch (RollbackException e)
-            {
-                // As expected
-            }
+            assertThatExceptionOfType(RollbackException.class)
+            		.isThrownBy(() -> tm.commit());
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM008() throws Exception {
         try
         {
@@ -162,25 +159,14 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
 
-        try
-        {
-            tm.commit();
-            fail();
-        }
-        catch(RollbackException e)
-        {
-            // As expected
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-            fail();
-        }
+        assertThatExceptionOfType(RollbackException.class)
+        		.isThrownBy(() -> tm.commit());
     }
 
+    @Test
     public void testTM009() throws Exception {
         try
         {
@@ -190,39 +176,24 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
+
+        assertThatThrownBy(() -> tm.commit())
+        		.isInstanceOfAny(HeuristicRollbackException.class, RollbackException.class);
 
         try
         {
-            tm.commit();
-            fail();
-        }
-        catch(HeuristicRollbackException e)
-        {
-            // As expected
-        }
-        catch (RollbackException e)
-        {
-            // As expected
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-            fail();
-        }
-
-        try
-        {
-            assertEquals(tm.getStatus(), Status.STATUS_NO_TRANSACTION);
+            assertThat(Status.STATUS_NO_TRANSACTION).isEqualTo(tm.getStatus());
         }
         catch(SystemException e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM010() throws Exception {
         try
         {
@@ -232,29 +203,14 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
 
-        try
-        {
-            tm.commit();
-            fail();
-        }
-        catch(HeuristicMixedException e)
-        {
-            // As expected
-        }
-        catch (RollbackException e)
-        {
-            // As expected
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-            fail();
-        }
+        assertThatThrownBy(() -> tm.commit())
+        		.isInstanceOfAny(HeuristicMixedException.class, RollbackException.class);
     }
 
+    @Test
     public void testTM011() throws Exception {
         try
         {
@@ -264,25 +220,14 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
 
-        try
-        {
-            tm.commit();
-            fail();
-        }
-        catch (IllegalStateException e)
-        {
-            // As expected
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            fail();
-        }
+        assertThatExceptionOfType(IllegalStateException.class)
+        		.isThrownBy(() -> tm.commit());
     }
 
+    @Test
     public void testTM012() throws Exception {
         try
         {
@@ -292,113 +237,108 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
 
-        try
-        {
-            tm.rollback();
-            fail();
-        }
-        catch (IllegalStateException e)
-        {
-            // As expected
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            fail();
-        }
+        assertThatExceptionOfType(IllegalStateException.class)
+        		.isThrownBy(() -> tm.rollback());
     }
 
+    @Test
     public void testTM013() throws Exception {
         try
         {
-            assertEquals(tm.getStatus(), Status.STATUS_NO_TRANSACTION);
+            assertThat(Status.STATUS_NO_TRANSACTION).isEqualTo(tm.getStatus());
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM014() throws Exception {
         try
         {
             tm.begin();
 
-            assertEquals(tm.getStatus(), Status.STATUS_ACTIVE);
+            assertThat(Status.STATUS_ACTIVE).isEqualTo(tm.getStatus());
 
             tm.commit();
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM015() throws Exception {
         try
         {
             tm.begin();
             tm.setRollbackOnly();
 
-            assertEquals(tm.getStatus(), Status.STATUS_MARKED_ROLLBACK);
+            assertThat(Status.STATUS_MARKED_ROLLBACK).isEqualTo(tm.getStatus());
 
             tm.rollback();
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM016() throws Exception {
         try
         {
             tm.begin();
             tm.commit();
 
-            assertEquals(tm.getStatus(), Status.STATUS_NO_TRANSACTION);
+            assertThat(Status.STATUS_NO_TRANSACTION).isEqualTo(tm.getStatus());
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM017() throws Exception {
         try
         {
             tm.begin();
 
-            assertNotNull(tm.getTransaction());
+            assertThat(tm.getTransaction()).isNotNull();
 
             tm.commit();
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM018() throws Exception {
         try
         {
-            assertNull(tm.getTransaction());
+            assertThat(tm.getTransaction()).isNull();
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM020() throws Exception {
         try
         {
@@ -411,10 +351,11 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM021() throws Exception {
         Transaction tx = null;
         try
@@ -426,13 +367,13 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
 
         try
         {
             tm.resume(tx);
-            fail();
+            fail("");
         }
         catch(InvalidTransactionException e)
         {
@@ -441,16 +382,17 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM022() throws Exception {
         try
         {
             tm.begin();
             tm.resume(null);
-            fail();
+            fail("");
         }
         catch (IllegalStateException e)
         {
@@ -459,7 +401,7 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
 
         try
@@ -469,10 +411,11 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM023() throws Exception {
         Transaction tx = null;
         try
@@ -482,7 +425,7 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
 
             tm.begin();
             tm.resume(tx);
-            fail();
+            fail("");
         }
         catch (IllegalStateException e)
         {
@@ -491,7 +434,7 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
 
         try
@@ -503,10 +446,11 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM024() throws Exception {
         Transaction tx = null;
         try
@@ -517,7 +461,7 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
 
             tm.begin();
             tm.resume(tx);
-            fail();
+            fail("");
         }
         catch (IllegalStateException e)
         {
@@ -526,7 +470,7 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
 
         try
@@ -536,42 +480,45 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM025() throws Exception {
         Transaction tx = null;
         try
         {
             tm.begin();
             tx = tm.suspend();
-            assertNull(tm.getTransaction());
+            assertThat(tm.getTransaction()).isNull();
             tm.resume(tx);
             tm.rollback();
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM026() throws Exception {  
         try
         {
             tm.begin();
             tm.rollback();
 
-            assertEquals(tm.getStatus(), Status.STATUS_NO_TRANSACTION);
+            assertThat(Status.STATUS_NO_TRANSACTION).isEqualTo(tm.getStatus());
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM027() throws Exception {
         try
         {
@@ -579,15 +526,16 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
             tm.getTransaction().enlistResource(new XAResourceImpl());           
             tm.rollback();
 
-            assertEquals(tm.getStatus(), Status.STATUS_NO_TRANSACTION);
+            assertThat(Status.STATUS_NO_TRANSACTION).isEqualTo(tm.getStatus());
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM028() throws Exception {
         try
         {
@@ -596,15 +544,16 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
             tm.getTransaction().enlistResource(new XAResourceImpl());           
             tm.rollback();
 
-            assertEquals(tm.getStatus(), Status.STATUS_NO_TRANSACTION);
+            assertThat(Status.STATUS_NO_TRANSACTION).isEqualTo(tm.getStatus());
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM029() throws Exception {
         try
         {
@@ -612,32 +561,22 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
             tm.setRollbackOnly();           
             tm.rollback();
 
-            assertEquals(tm.getStatus(), Status.STATUS_NO_TRANSACTION);
+            assertThat(Status.STATUS_NO_TRANSACTION).isEqualTo(tm.getStatus());
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM030() throws Exception {
-        try
-        {
-            tm.rollback();
-            fail();
-        }
-        catch (IllegalStateException e)
-        {
-            // As expected
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            fail();
-        }
+        assertThatExceptionOfType(IllegalStateException.class)
+        		.isThrownBy(() -> tm.rollback());
     }
 
+    @Test
     public void testTM031() throws Exception {
         try
         {
@@ -647,25 +586,14 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
 
-        try
-        {
-            tm.rollback();
-            fail();
-        }
-        catch (IllegalStateException e)
-        {
-            // As expected
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            fail();
-        }
+        assertThatExceptionOfType(IllegalStateException.class)
+        		.isThrownBy(() -> tm.rollback());
     }
 
+    @Test
     public void testTM032() throws Exception {
         try
         {
@@ -675,42 +603,20 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
 
-        try
-        {
-            tm.commit();
-            fail();
-        }
-        catch (IllegalStateException e)
-        {
-            // As expected
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            fail();
-        }
+        assertThatExceptionOfType(IllegalStateException.class)
+        		.isThrownBy(() -> tm.commit());
     }
 
+    @Test
     public void testTM033() throws Exception {
-        try
-        {
-            tm.setRollbackOnly();
-            fail();
-        }
-        catch (IllegalStateException e)
-        {
-            // As expected
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            fail();
-        }
+        assertThatExceptionOfType(IllegalStateException.class)
+        		.isThrownBy(() -> tm.setRollbackOnly());
     }
 
+    @Test
     public void testTM034() throws Exception {
         try
         {
@@ -721,62 +627,41 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
 
-        try
-        {
-            tm.commit();
-            fail();
-        }
-        catch (RollbackException e)
-        {
-            // As expected
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            fail();
-        }
+        assertThatExceptionOfType(RollbackException.class)
+        		.isThrownBy(() -> tm.commit());
     }
 
+    @Test
     public void testTM040() throws Exception {
-        try
-        {
-            tm.setTransactionTimeout(-1);
-            fail();
-        }
-        catch (SystemException e)
-        {
-            // As expected
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            fail();
-        }
+        assertThatExceptionOfType(SystemException.class)
+        		.isThrownBy(() -> tm.setTransactionTimeout(-1));
     }
 
+    @Test
     public void testTM041() throws Exception {
         try
         {
-            assertNull(tm.suspend());
+            assertThat(tm.suspend()).isNull();
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM042() throws Exception {
         try
         {
             tm.begin();
             final Transaction tx = tm.suspend();
-            assertNotNull(tx);
+            assertThat(tx).isNotNull();
             
-            assertEquals(tm.getStatus(), Status.STATUS_NO_TRANSACTION);
+            assertThat(Status.STATUS_NO_TRANSACTION).isEqualTo(tm.getStatus());
 
             tm.resume(tx);
             tm.commit();
@@ -784,7 +669,7 @@ public class TransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 }

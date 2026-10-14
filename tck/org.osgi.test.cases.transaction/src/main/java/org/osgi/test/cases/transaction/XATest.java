@@ -18,12 +18,17 @@
 
 package org.osgi.test.cases.transaction;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.fail;
+
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.RollbackException;
 import javax.transaction.Transaction;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.test.cases.transaction.util.XAResourceImpl;
 
 /**
@@ -35,11 +40,13 @@ import org.osgi.test.cases.transaction.util.XAResourceImpl;
  */
 public class XATest extends TransactionTestBundleControl {
 
+    @BeforeEach
     public void setUp() throws Exception {
 		super.setUp();
         super.setUpTransactionManager();
     }
 
+    @Test
     public void testXA001() throws Exception {
         try
         {
@@ -62,10 +69,11 @@ public class XATest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testXA002() throws Exception {
         try
         {
@@ -83,23 +91,17 @@ public class XATest extends TransactionTestBundleControl {
             tx.enlistResource(new XAResourceImpl());
             tx.enlistResource(new XAResourceImpl());
 
-            try
-            {
-                tm.commit();
-                fail();
-            }
-            catch (RollbackException e)
-            {
-                // As expected
-            }
+            assertThatExceptionOfType(RollbackException.class)
+            		.isThrownBy(() -> tm.commit());
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testXA003() throws Exception {
         try
         {
@@ -117,23 +119,17 @@ public class XATest extends TransactionTestBundleControl {
             tx.enlistResource(new XAResourceImpl());
             tx.enlistResource(new XAResourceImpl());
 
-            try
-            {
-                tm.commit();
-                fail();
-            }
-            catch (RollbackException e)
-            {
-                // As expected
-            }
+            assertThatExceptionOfType(RollbackException.class)
+            		.isThrownBy(() -> tm.commit());
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testXA004() throws Exception {
         try
         {
@@ -151,23 +147,17 @@ public class XATest extends TransactionTestBundleControl {
             tx.enlistResource(new XAResourceImpl());
             tx.enlistResource(new XAResourceImpl().setPrepareAction(XAException.XA_RBROLLBACK));
 
-            try
-            {
-                tm.commit();
-                fail();
-            }
-            catch (RollbackException e)
-            {
-                // As expected
-            }
+            assertThatExceptionOfType(RollbackException.class)
+            		.isThrownBy(() -> tm.commit());
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testXA005() throws Exception {
         try
         {
@@ -187,23 +177,17 @@ public class XATest extends TransactionTestBundleControl {
 
             tx.setRollbackOnly();
 
-            try
-            {
-                tm.commit();
-                fail();
-            }
-            catch (RollbackException e)
-            {
-                // As expected
-            }
+            assertThatExceptionOfType(RollbackException.class)
+            		.isThrownBy(() -> tm.commit());
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testXA006() throws Exception {
         try
         {
@@ -226,10 +210,11 @@ public class XATest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testXA007() throws Exception {
         try
         {
@@ -253,10 +238,11 @@ public class XATest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testXA008() throws Exception {
         try
         {
@@ -279,10 +265,11 @@ public class XATest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testXA009() throws Exception {
         try
         {
@@ -300,23 +287,17 @@ public class XATest extends TransactionTestBundleControl {
             tx.enlistResource(new XAResourceImpl().setPrepareAction(XAResource.XA_RDONLY));
             tx.enlistResource(new XAResourceImpl());
 
-            try
-            {
-                tm.commit();
-                fail();
-            }
-            catch (RollbackException e)
-            {
-                // As expected
-            }
+            assertThatExceptionOfType(RollbackException.class)
+            		.isThrownBy(() -> tm.commit());
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testXA010() throws Exception {
         try
         {
@@ -334,23 +315,17 @@ public class XATest extends TransactionTestBundleControl {
             tx.enlistResource(new XAResourceImpl().setPrepareAction(XAResource.XA_RDONLY));
             tx.enlistResource(new XAResourceImpl());
 
-            try
-            {
-                tm.commit();
-                fail();
-            }
-            catch (HeuristicMixedException e)
-            {
-                // As expected
-            }
+            assertThatExceptionOfType(HeuristicMixedException.class)
+            		.isThrownBy(() -> tm.commit());
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testXA011() throws Exception {
         try
         {
@@ -368,23 +343,17 @@ public class XATest extends TransactionTestBundleControl {
             tx.enlistResource(new XAResourceImpl().setPrepareAction(XAResource.XA_RDONLY));
             tx.enlistResource(new XAResourceImpl());
 
-            try
-            {
-                tm.commit();
-                fail();
-            }
-            catch (HeuristicMixedException e)
-            {
-                // As expected
-            }
+            assertThatExceptionOfType(HeuristicMixedException.class)
+            		.isThrownBy(() -> tm.commit());
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testXA013() throws Exception {
         try
         {
@@ -402,20 +371,13 @@ public class XATest extends TransactionTestBundleControl {
             tx.enlistResource(new XAResourceImpl());
             tx.enlistResource(new XAResourceImpl().setCommitAction(XAException.XA_HEURCOM));
 
-            try
-            {
-                tm.commit();
-                fail();
-            }
-            catch (HeuristicMixedException e)
-            {
-                // As expected
-            }
+            assertThatExceptionOfType(HeuristicMixedException.class)
+            		.isThrownBy(() -> tm.commit());
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 }

@@ -22,7 +22,6 @@ import javax.transaction.UserTransaction;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.test.support.sleep.Sleep;
 
 /**
  * @version $Rev$ $Date$
@@ -64,7 +63,7 @@ public class UserTransactionFactory {
                 // and try again
                 if (_userTxServiceRef == null) {
                     try {
-						Sleep.sleep(1000);
+						Thread.sleep(1000);
                     } catch (InterruptedException ie) {
                         ie.printStackTrace();
                     }

@@ -18,11 +18,16 @@
 
 package org.osgi.test.cases.transaction;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.RollbackException;
 import javax.transaction.xa.XAException;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.test.cases.transaction.util.XAResourceImpl;
 
 /**
@@ -34,18 +39,20 @@ import org.osgi.test.cases.transaction.util.XAResourceImpl;
  */
 public class HeuristicTest extends TransactionTestBundleControl {
 
+    @BeforeEach
     public void setUp() throws Exception {
 		super.setUp();
         super.setUpTransactionManager();
     }
 
+    @Test
     public void testHE001() throws Exception {
         try
         {
             tm.begin();
             tm.getTransaction().enlistResource(new XAResourceImpl().setCommitAction(XAException.XA_HEURRB));
             tm.commit();
-            fail();
+            fail("");
         }
         catch (HeuristicRollbackException e)
         {
@@ -54,19 +61,20 @@ public class HeuristicTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        assertTrue(XAResourceImpl.checkForgotten());
+        assertThat(XAResourceImpl.checkForgotten()).isTrue();
     }
 
+    @Test
     public void testHE002() throws Exception {
         try
         {
             tm.begin();
             tm.getTransaction().enlistResource(new XAResourceImpl().setCommitAction(XAException.XA_HEURMIX));
             tm.commit();
-            fail();
+            fail("");
         }
         catch (HeuristicMixedException e)
         {
@@ -75,12 +83,13 @@ public class HeuristicTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        assertTrue(XAResourceImpl.checkForgotten());
+        assertThat(XAResourceImpl.checkForgotten()).isTrue();
     }
 
+    @Test
     public void testHE003() throws Exception {
         try
         {
@@ -91,12 +100,13 @@ public class HeuristicTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        assertTrue(XAResourceImpl.checkForgotten());
+        assertThat(XAResourceImpl.checkForgotten()).isTrue();
     }
 
+    @Test
     public void testHE005() throws Exception {
         try
         {
@@ -104,7 +114,7 @@ public class HeuristicTest extends TransactionTestBundleControl {
             tm.getTransaction().enlistResource(new XAResourceImpl().setCommitAction(XAException.XA_HEURRB));
             tm.getTransaction().enlistResource(new XAResourceImpl().setCommitAction(XAException.XA_HEURRB));
             tm.commit();
-            fail();
+            fail("");
         }
         catch (HeuristicRollbackException e)
         {
@@ -113,12 +123,13 @@ public class HeuristicTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        assertTrue(XAResourceImpl.checkForgotten());
+        assertThat(XAResourceImpl.checkForgotten()).isTrue();
     }
 
+    @Test
     public void testHE006() throws Exception {
         try
         {
@@ -126,7 +137,7 @@ public class HeuristicTest extends TransactionTestBundleControl {
             tm.getTransaction().enlistResource(new XAResourceImpl().setCommitAction(XAException.XA_HEURRB));
             tm.getTransaction().enlistResource(new XAResourceImpl().setCommitAction(XAException.XA_HEURMIX));
             tm.commit();
-            fail();
+            fail("");
         }
         catch (HeuristicMixedException e)
         {
@@ -135,12 +146,13 @@ public class HeuristicTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        assertTrue(XAResourceImpl.checkForgotten());
+        assertThat(XAResourceImpl.checkForgotten()).isTrue();
     }
 
+    @Test
     public void testHE007() throws Exception {
         try
         {
@@ -148,7 +160,7 @@ public class HeuristicTest extends TransactionTestBundleControl {
             tm.getTransaction().enlistResource(new XAResourceImpl().setCommitAction(XAException.XA_HEURRB));
             tm.getTransaction().enlistResource(new XAResourceImpl().setCommitAction(XAException.XA_HEURCOM));
             tm.commit();
-            fail();
+            fail("");
         }
         catch (HeuristicMixedException e)
         {
@@ -157,12 +169,13 @@ public class HeuristicTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        assertTrue(XAResourceImpl.checkForgotten());
+        assertThat(XAResourceImpl.checkForgotten()).isTrue();
     }
 
+    @Test
     public void testHE009() throws Exception {
         try
         {
@@ -170,7 +183,7 @@ public class HeuristicTest extends TransactionTestBundleControl {
             tm.getTransaction().enlistResource(new XAResourceImpl().setCommitAction(XAException.XA_HEURRB));
             tm.getTransaction().enlistResource(new XAResourceImpl());
             tm.commit();
-            fail();
+            fail("");
         }
         catch (HeuristicMixedException e)
         {
@@ -179,12 +192,13 @@ public class HeuristicTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        assertTrue(XAResourceImpl.checkForgotten());
+        assertThat(XAResourceImpl.checkForgotten()).isTrue();
     }
 
+    @Test
     public void testHE010() throws Exception {
         try
         {
@@ -192,7 +206,7 @@ public class HeuristicTest extends TransactionTestBundleControl {
             tm.getTransaction().enlistResource(new XAResourceImpl().setCommitAction(XAException.XA_HEURMIX));
             tm.getTransaction().enlistResource(new XAResourceImpl().setCommitAction(XAException.XA_HEURMIX));
             tm.commit();
-            fail();
+            fail("");
         }
         catch (HeuristicMixedException e)
         {
@@ -201,12 +215,13 @@ public class HeuristicTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        assertTrue(XAResourceImpl.checkForgotten());
+        assertThat(XAResourceImpl.checkForgotten()).isTrue();
     }
 
+    @Test
     public void testHE011() throws Exception {
         try
         {
@@ -214,7 +229,7 @@ public class HeuristicTest extends TransactionTestBundleControl {
             tm.getTransaction().enlistResource(new XAResourceImpl().setCommitAction(XAException.XA_HEURMIX));
             tm.getTransaction().enlistResource(new XAResourceImpl().setCommitAction(XAException.XA_HEURCOM));
             tm.commit();
-            fail();
+            fail("");
         }
         catch (HeuristicMixedException e)
         {
@@ -223,12 +238,13 @@ public class HeuristicTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        assertTrue(XAResourceImpl.checkForgotten());
+        assertThat(XAResourceImpl.checkForgotten()).isTrue();
     }
 
+    @Test
     public void testHE013() throws Exception {
         try
         {
@@ -236,7 +252,7 @@ public class HeuristicTest extends TransactionTestBundleControl {
             tm.getTransaction().enlistResource(new XAResourceImpl().setCommitAction(XAException.XA_HEURMIX));
             tm.getTransaction().enlistResource(new XAResourceImpl());
             tm.commit();
-            fail();
+            fail("");
         }
         catch (HeuristicMixedException e)
         {
@@ -245,12 +261,13 @@ public class HeuristicTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        assertTrue(XAResourceImpl.checkForgotten());
+        assertThat(XAResourceImpl.checkForgotten()).isTrue();
     }
 
+    @Test
     public void testHE014() throws Exception {
         try
         {
@@ -262,12 +279,13 @@ public class HeuristicTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        assertTrue(XAResourceImpl.checkForgotten());
+        assertThat(XAResourceImpl.checkForgotten()).isTrue();
     }
 
+    @Test
     public void testHE016() throws Exception {
         try
         {
@@ -279,12 +297,13 @@ public class HeuristicTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        assertTrue(XAResourceImpl.checkForgotten());
+        assertThat(XAResourceImpl.checkForgotten()).isTrue();
     }
 
+    @Test
     public void testHE019() throws Exception {
         try
         {
@@ -295,12 +314,13 @@ public class HeuristicTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        assertTrue(XAResourceImpl.checkForgotten());
+        assertThat(XAResourceImpl.checkForgotten()).isTrue();
     }
 
+    @Test
     public void testHE023() throws Exception {
         try
         {
@@ -312,12 +332,13 @@ public class HeuristicTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        assertTrue(XAResourceImpl.checkForgotten());
+        assertThat(XAResourceImpl.checkForgotten()).isTrue();
     }
 
+    @Test
     public void testHE027() throws Exception {
         try
         {
@@ -329,12 +350,13 @@ public class HeuristicTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        assertTrue(XAResourceImpl.checkForgotten());
+        assertThat(XAResourceImpl.checkForgotten()).isTrue();
     }
 
+    @Test
     public void testHE046() throws Exception {
         try
         {
@@ -342,7 +364,7 @@ public class HeuristicTest extends TransactionTestBundleControl {
             tm.getTransaction().enlistResource(new XAResourceImpl().setPrepareAction(XAException.XA_RBROLLBACK));
             tm.getTransaction().enlistResource(new XAResourceImpl().setRollbackAction(XAException.XA_HEURRB));
             tm.commit();
-            fail();
+            fail("");
         }
         catch (RollbackException e)
         {
@@ -351,12 +373,13 @@ public class HeuristicTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        assertTrue(XAResourceImpl.checkForgotten());
+        assertThat(XAResourceImpl.checkForgotten()).isTrue();
     }
 
+    @Test
     public void testHE062() throws Exception {
         try
         {
@@ -365,7 +388,7 @@ public class HeuristicTest extends TransactionTestBundleControl {
             tm.getTransaction().enlistResource(new XAResourceImpl().setRollbackAction(XAException.XA_HEURRB));
             tm.getTransaction().enlistResource(new XAResourceImpl().setRollbackAction(XAException.XA_HEURRB));
             tm.commit();
-            fail();
+            fail("");
         }
         catch (RollbackException e)
         {
@@ -374,9 +397,9 @@ public class HeuristicTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        assertTrue(XAResourceImpl.checkForgotten());
+        assertThat(XAResourceImpl.checkForgotten()).isTrue();
     }   
 }

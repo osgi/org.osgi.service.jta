@@ -18,12 +18,18 @@
 
 package org.osgi.test.cases.transaction;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.fail;
+
 import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.Status;
 import javax.transaction.Transaction;
 import javax.transaction.xa.XAResource;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.test.cases.transaction.util.SimpleTestResource;
 
 /**
@@ -36,264 +42,261 @@ import org.osgi.test.cases.transaction.util.SimpleTestResource;
 
 public class SimpleTransactionManagerTest extends TransactionTestBundleControl {
     
+    @BeforeEach
     public void setUp() throws Exception {
 		super.setUp();
         super.setUpTransactionManager();
     }
 
     // 4.5.3 4.5.5 simple test transaction manager commit without resource
+    @Test
     public void testTransactionManager1() throws Exception {
         startWithClean();
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
         
         tm.begin();       
-        assertEquals(Status.STATUS_ACTIVE, tm.getStatus());
-        assertNotNull(tm.getTransaction());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
+        assertThat(tm.getTransaction()).isNotNull();
         
         tm.commit();
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull();
         
         tm.begin();
-        assertEquals(Status.STATUS_ACTIVE, tm.getStatus());
-        assertNotNull(tm.getTransaction());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
+        assertThat(tm.getTransaction()).isNotNull();
         
         tm.commit();
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull();
     }
     
     // 4.5.3 4.5.5 simple test transaction manager commit with resource
+    @Test
     public void testTransactionManager2() throws Exception {
         startWithClean();
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
         
         tm.begin();        
         SimpleTestResource res1 = new SimpleTestResource("res1");
         SimpleTestResource res2 = new SimpleTestResource("res2");
         tm.getTransaction().enlistResource(res1);
         tm.getTransaction().enlistResource(res2);
-        assertFalse(res1.isCommitted());
-        assertFalse(res2.isCommitted());
-        assertFalse(res1.isRolledback());
-        assertFalse(res2.isRolledback());
-        assertEquals(Status.STATUS_ACTIVE, tm.getStatus());
-        assertNotNull(tm.getTransaction());
+        assertThat(res1.isCommitted()).isFalse();
+        assertThat(res2.isCommitted()).isFalse();
+        assertThat(res1.isRolledback()).isFalse();
+        assertThat(res2.isRolledback()).isFalse();
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
+        assertThat(tm.getTransaction()).isNotNull();
         
         tm.getTransaction().delistResource(res1, XAResource.TMSUCCESS);
         tm.getTransaction().delistResource(res2, XAResource.TMSUCCESS);
         tm.commit();
-        assertTrue(res1.isCommitted());
-        assertTrue(res2.isCommitted());
-        assertFalse(res1.isRolledback());
-        assertFalse(res2.isRolledback());
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction());
+        assertThat(res1.isCommitted()).isTrue();
+        assertThat(res2.isCommitted()).isTrue();
+        assertThat(res1.isRolledback()).isFalse();
+        assertThat(res2.isRolledback()).isFalse();
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull();
         
         tm.begin();        
         res1 = new SimpleTestResource("res1");
         res2 = new SimpleTestResource("res2");
         tm.getTransaction().enlistResource(res1);
         tm.getTransaction().enlistResource(res2);
-        assertFalse(res1.isCommitted());
-        assertFalse(res2.isCommitted());
-        assertFalse(res1.isRolledback());
-        assertFalse(res2.isRolledback());
-        assertEquals(Status.STATUS_ACTIVE, tm.getStatus());
-        assertNotNull(tm.getTransaction());
+        assertThat(res1.isCommitted()).isFalse();
+        assertThat(res2.isCommitted()).isFalse();
+        assertThat(res1.isRolledback()).isFalse();
+        assertThat(res2.isRolledback()).isFalse();
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
+        assertThat(tm.getTransaction()).isNotNull();
         
         tm.getTransaction().delistResource(res1, XAResource.TMSUCCESS);
         tm.getTransaction().delistResource(res2, XAResource.TMSUCCESS);
         tm.commit();
-        assertTrue(res1.isCommitted());
-        assertTrue(res2.isCommitted());
-        assertFalse(res1.isRolledback());
-        assertFalse(res2.isRolledback());
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction());
+        assertThat(res1.isCommitted()).isTrue();
+        assertThat(res2.isCommitted()).isTrue();
+        assertThat(res1.isRolledback()).isFalse();
+        assertThat(res2.isRolledback()).isFalse();
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull();
     }
     // 4.5.1, 4.5.6 test transaction manager status, rollback without resource
+    @Test
     public void testTransactionManager3() throws Exception {
         startWithClean();
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull();
         
         tm.begin();
-        assertEquals(Status.STATUS_ACTIVE, tm.getStatus());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
         Transaction tx = tm.getTransaction();
-        assertNotNull(tx);
-        assertEquals(Status.STATUS_ACTIVE, tx.getStatus());
+        assertThat(tx).isNotNull();
+        assertThat(tx.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
          
         tm.rollback();
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction());     
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull();     
          
         tm.begin();
-        assertEquals(Status.STATUS_ACTIVE, tm.getStatus());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
         tx = tm.getTransaction();
-        assertNotNull(tx);
-        assertEquals(Status.STATUS_ACTIVE, tx.getStatus());
+        assertThat(tx).isNotNull();
+        assertThat(tx.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
          
         tm.rollback();
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction()); 
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull(); 
     }
     
     // 4.5.1, 4.5.6 test transaction manager status, rollback with resource
+    @Test
     public void testTransactionManager4() throws Exception {
         startWithClean();
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull();
         SimpleTestResource res1 = new SimpleTestResource("res1");
         SimpleTestResource res2 = new SimpleTestResource("res2");
         
         tm.begin();
-        assertEquals(Status.STATUS_ACTIVE, tm.getStatus());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
         Transaction tx = tm.getTransaction();
-        assertNotNull(tx);
-        assertEquals(Status.STATUS_ACTIVE, tx.getStatus());
+        assertThat(tx).isNotNull();
+        assertThat(tx.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
         
         tm.getTransaction().enlistResource(res1);
         tm.getTransaction().enlistResource(res2);
-        assertFalse(res1.isCommitted());
-        assertFalse(res2.isCommitted());
-        assertFalse(res1.isRolledback());
-        assertFalse(res2.isRolledback());
+        assertThat(res1.isCommitted()).isFalse();
+        assertThat(res2.isCommitted()).isFalse();
+        assertThat(res1.isRolledback()).isFalse();
+        assertThat(res2.isRolledback()).isFalse();
          
         tm.getTransaction().delistResource(res1, XAResource.TMSUCCESS);
         tm.getTransaction().delistResource(res2, XAResource.TMSUCCESS);
         tm.rollback();
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction());     
-        assertFalse(res1.isCommitted());
-        assertFalse(res2.isCommitted());
-        assertTrue(res1.isRolledback());
-        assertTrue(res2.isRolledback());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull();     
+        assertThat(res1.isCommitted()).isFalse();
+        assertThat(res2.isCommitted()).isFalse();
+        assertThat(res1.isRolledback()).isTrue();
+        assertThat(res2.isRolledback()).isTrue();
     }
 
     // 4.5.3 test transaction manager status, commit fail, without resource
+    @Test
     public void testTransactionManager5() throws Exception {
         startWithClean();
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull();
         
         tm.begin();
-        assertEquals(Status.STATUS_ACTIVE, tm.getStatus());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
         Transaction tx = tm.getTransaction();
-        assertNotNull(tx);
-        assertEquals(Status.STATUS_ACTIVE, tx.getStatus());
+        assertThat(tx).isNotNull();
+        assertThat(tx.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
          
         // set roll back only.   commit should fail
         tm.setRollbackOnly();
-        assertEquals(Status.STATUS_MARKED_ROLLBACK, tm.getStatus());
-        try {
-            tm.commit();
-            fail("expected a RollbackException : the transaction has been rolled back.");
-        } catch (RollbackException e) {
-            // expected
-        }
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_MARKED_ROLLBACK);
+        assertThatExceptionOfType(RollbackException.class).as("expected a RollbackException : the transaction has been rolled back.")
+        		.isThrownBy(() -> tm.commit());
         
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction()); 
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull(); 
     }
     
     // 4.5.3 test transaction manager status, commit fail, with resource
+    @Test
     public void testTransactionManager6() throws Exception {
         startWithClean();
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull();
         SimpleTestResource res1 = new SimpleTestResource("res1");
         SimpleTestResource res2 = new SimpleTestResource("res2");
         
         tm.begin();
-        assertEquals(Status.STATUS_ACTIVE, tm.getStatus());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
         Transaction tx = tm.getTransaction();
-        assertNotNull(tx);
-        assertEquals(Status.STATUS_ACTIVE, tx.getStatus());
+        assertThat(tx).isNotNull();
+        assertThat(tx.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
         
         tm.getTransaction().enlistResource(res1);
         tm.getTransaction().enlistResource(res2);
-        assertFalse(res1.isCommitted());
-        assertFalse(res2.isCommitted());
-        assertFalse(res1.isRolledback());
-        assertFalse(res2.isRolledback());
+        assertThat(res1.isCommitted()).isFalse();
+        assertThat(res2.isCommitted()).isFalse();
+        assertThat(res1.isRolledback()).isFalse();
+        assertThat(res2.isRolledback()).isFalse();
          
         // set roll back only.   commit should fail
         tm.setRollbackOnly();
-        assertEquals(Status.STATUS_MARKED_ROLLBACK, tm.getStatus());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_MARKED_ROLLBACK);
         tm.getTransaction().delistResource(res1, XAResource.TMSUCCESS);
         tm.getTransaction().delistResource(res2, XAResource.TMSUCCESS);
-        try {
-            tm.commit();
-            fail("expected a RollbackException : the transaction has been rolled back.");
-        } catch (RollbackException e) {
-            // expected
-        }
+        assertThatExceptionOfType(RollbackException.class).as("expected a RollbackException : the transaction has been rolled back.")
+        		.isThrownBy(() -> tm.commit());
         
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction()); 
-        assertFalse(res1.isCommitted());
-        assertFalse(res2.isCommitted());
-        assertTrue(res1.isRolledback());
-        assertTrue(res2.isRolledback());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull(); 
+        assertThat(res1.isCommitted()).isFalse();
+        assertThat(res2.isCommitted()).isFalse();
+        assertThat(res1.isRolledback()).isTrue();
+        assertThat(res2.isRolledback()).isTrue();
     }
     // test 4.3.1 Nested transactions are not supported. 
+    @Test
     public void testTransactionManagerNested() throws Exception {
         startWithClean();
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull();
         
         tm.begin();
-        assertEquals(Status.STATUS_ACTIVE, tm.getStatus());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
         Transaction tx = tm.getTransaction();
-        assertNotNull(tx);
-        assertEquals(Status.STATUS_ACTIVE, tx.getStatus());
+        assertThat(tx).isNotNull();
+        assertThat(tx.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
         
         tm.rollback();
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction());     
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull();     
         
         tm.begin();
-        assertEquals(Status.STATUS_ACTIVE, tm.getStatus());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
         
-        try {
-            tm.begin();
-            fail("expected a NotSupportedException : Nested Transactions are not supported.");
-        } catch (NotSupportedException e) {
-            // expected
-        }
+        assertThatExceptionOfType(NotSupportedException.class).as("expected a NotSupportedException : Nested Transactions are not supported.")
+        		.isThrownBy(() -> tm.begin());
         
         tm.commit();
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull();
     }
     
     // 4.5.8 test transaction suspend/resume
     // test transaction manager status without resource
+    @Test
     public void testTransactionManager10() throws Exception {
         startWithClean();
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull();
         
         tm.begin();
-        assertEquals(Status.STATUS_ACTIVE, tm.getStatus());
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
         Transaction tx = tm.getTransaction();
-        assertNotNull(tx);
-        assertEquals(Status.STATUS_ACTIVE, tx.getStatus());
+        assertThat(tx).isNotNull();
+        assertThat(tx.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
         
         tx = tm.suspend();
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction()); 
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull(); 
         
         tm.resume(tx);
 
-        assertEquals(Status.STATUS_ACTIVE, tm.getStatus());
-        assertNotNull(tm.getTransaction());
-        assertEquals(tx, tm.getTransaction());  
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_ACTIVE);
+        assertThat(tm.getTransaction()).isNotNull();
+        assertThat(tm.getTransaction()).isEqualTo(tx);  
      
         tm.rollback();
-        assertEquals(Status.STATUS_NO_TRANSACTION, tm.getStatus());
-        assertNull(tm.getTransaction()); 
+        assertThat(tm.getStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
+        assertThat(tm.getTransaction()).isNull(); 
     }
     
     private void startWithClean()
@@ -309,7 +312,7 @@ public class SimpleTransactionManagerTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();     
+            fail("");     
         }
     }  
 

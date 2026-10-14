@@ -33,7 +33,6 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-import org.osgi.test.support.sleep.Sleep;
 
 /**
  * @version $Rev$ $Date$
@@ -344,7 +343,7 @@ public class XAResourceImpl implements XAResource, Serializable {
 
                 case SLEEP_COMMIT:
                     try {
-							Sleep.sleep(self().getSleepTime());
+							Thread.sleep(self().getSleepTime());
                     } catch (InterruptedException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -455,7 +454,7 @@ public class XAResourceImpl implements XAResource, Serializable {
 
         case SLEEP_COMMIT:
             try {
-					Sleep.sleep(self().getSleepTime());
+					Thread.sleep(self().getSleepTime());
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 throw new RuntimeException();
@@ -466,7 +465,7 @@ public class XAResourceImpl implements XAResource, Serializable {
 
         case SLEEP_ROLLBACK:
             try {
-					Sleep.sleep(self().getSleepTime());
+					Thread.sleep(self().getSleepTime());
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 throw new RuntimeException();
@@ -550,7 +549,7 @@ public class XAResourceImpl implements XAResource, Serializable {
 
                 case SLEEP_ROLLBACK:
                     try {
-							Sleep.sleep(self().getSleepTime());
+							Thread.sleep(self().getSleepTime());
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

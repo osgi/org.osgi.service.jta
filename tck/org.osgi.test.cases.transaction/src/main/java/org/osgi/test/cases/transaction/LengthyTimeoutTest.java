@@ -18,12 +18,15 @@
 
 package org.osgi.test.cases.transaction;
 
+import static org.assertj.core.api.Assertions.fail;
+
 import javax.transaction.RollbackException;
 import javax.transaction.Transaction;
 import javax.transaction.xa.XAException;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.test.cases.transaction.util.XAResourceImpl;
-import org.osgi.test.support.sleep.Sleep;
 
 /**
  * @version $Rev$ $Date$
@@ -37,11 +40,13 @@ public class LengthyTimeoutTest extends TransactionTestBundleControl {
     private static final int TEST_TRANSACTION_TIMEOUT = 10;
     private static final int SUITABLE_DELAY = 5;
 
+    @BeforeEach
     public void setUp() throws Exception {
 		super.setUp();
         super.setUpTransactionManager();
     }
 
+    @Test
     public void testTO001() throws Exception {
         try
         {
@@ -49,7 +54,7 @@ public class LengthyTimeoutTest extends TransactionTestBundleControl {
             tm.begin();
             final Transaction tx = tm.suspend();
 
-			Sleep.sleep(1000 * (DEFAULT_TRANSACTION_TIMEOUT - SUITABLE_DELAY));
+			Thread.sleep(1000 * (DEFAULT_TRANSACTION_TIMEOUT - SUITABLE_DELAY));
 
             tm.resume(tx);
             tm.commit();
@@ -57,10 +62,11 @@ public class LengthyTimeoutTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTO002() throws Exception {
         try
         {
@@ -68,11 +74,11 @@ public class LengthyTimeoutTest extends TransactionTestBundleControl {
             tm.begin();
             final Transaction tx = tm.suspend();
 
-			Sleep.sleep(1000 * (DEFAULT_TRANSACTION_TIMEOUT + SUITABLE_DELAY));
+			Thread.sleep(1000 * (DEFAULT_TRANSACTION_TIMEOUT + SUITABLE_DELAY));
 
             tm.resume(tx);
             tm.commit();
-            fail();
+            fail("");
         }
         catch(RollbackException e)
         {
@@ -81,10 +87,11 @@ public class LengthyTimeoutTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTO003() throws Exception {
         try
         {
@@ -92,7 +99,7 @@ public class LengthyTimeoutTest extends TransactionTestBundleControl {
             tm.begin();
             final Transaction tx = tm.suspend();
 
-			Sleep.sleep(1000 * (TEST_TRANSACTION_TIMEOUT - SUITABLE_DELAY));
+			Thread.sleep(1000 * (TEST_TRANSACTION_TIMEOUT - SUITABLE_DELAY));
 
             tm.resume(tx);
             tm.commit();
@@ -100,10 +107,11 @@ public class LengthyTimeoutTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTO004() throws Exception {
         try
         {
@@ -111,7 +119,7 @@ public class LengthyTimeoutTest extends TransactionTestBundleControl {
             tm.begin();
             final Transaction tx = tm.suspend();
 
-			Sleep.sleep(1000 * (TEST_TRANSACTION_TIMEOUT + SUITABLE_DELAY));
+			Thread.sleep(1000 * (TEST_TRANSACTION_TIMEOUT + SUITABLE_DELAY));
 
             tm.resume(tx);
             tm.commit();
@@ -123,10 +131,11 @@ public class LengthyTimeoutTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTO005() throws Exception {
         try
         {
@@ -139,10 +148,11 @@ public class LengthyTimeoutTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTO006() throws Exception {
         try
         {
@@ -151,7 +161,7 @@ public class LengthyTimeoutTest extends TransactionTestBundleControl {
             tm.getTransaction().enlistResource(new XAResourceImpl());
             tm.getTransaction().enlistResource(new XAResourceImpl().setPrepareAction(XAResourceImpl.SLEEP_ROLLBACK).setSleepTime(1000 * (DEFAULT_TRANSACTION_TIMEOUT * 2 + SUITABLE_DELAY)));
             tm.commit();
-            fail();
+            fail("");
         }
         catch (RollbackException e)
         {
@@ -160,10 +170,11 @@ public class LengthyTimeoutTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTO007() throws Exception {
         try
         {
@@ -176,10 +187,11 @@ public class LengthyTimeoutTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTO008() throws Exception {
         try
         {
@@ -188,7 +200,7 @@ public class LengthyTimeoutTest extends TransactionTestBundleControl {
             tm.getTransaction().enlistResource(new XAResourceImpl().setPrepareAction(XAException.XA_RBROLLBACK));
             tm.getTransaction().enlistResource(new XAResourceImpl().setRollbackAction(XAResourceImpl.SLEEP_ROLLBACK).setSleepTime(1000 * (DEFAULT_TRANSACTION_TIMEOUT * 2 + SUITABLE_DELAY)));
             tm.commit();
-            fail();
+            fail("");
         }
         catch (RollbackException e)
         {
@@ -197,7 +209,7 @@ public class LengthyTimeoutTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
     }
 }
