@@ -18,10 +18,16 @@
 
 package org.osgi.test.cases.transaction;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.fail;
+
 import javax.transaction.RollbackException;
 import javax.transaction.Status;
 import javax.transaction.TransactionSynchronizationRegistry;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.test.cases.transaction.util.SynchronizationImpl;
 import org.osgi.test.cases.transaction.util.TransactionSynchronizationRegistryFactory;
 
@@ -34,23 +40,27 @@ import org.osgi.test.cases.transaction.util.TransactionSynchronizationRegistryFa
  */
 public class TransactionSynchronizationRegistryTest extends TransactionTestBundleControl {
 
+    @BeforeEach
     public void setUp() throws Exception {
 		super.setUp();
         super.setUpTransactionManager();
     }
     
+    @Test
     public void testTSR001() throws Exception {
         final TransactionSynchronizationRegistry tsr = TransactionSynchronizationRegistryFactory.getTransactionSynchronizationRegistry();
 
-        assertNull(tsr.getTransactionKey());
+        assertThat(tsr.getTransactionKey()).isNull();
     }
 
+    @Test
     public void testTSR002() throws Exception {
         final TransactionSynchronizationRegistry tsr = TransactionSynchronizationRegistryFactory.getTransactionSynchronizationRegistry();
 
-        assertEquals(Status.STATUS_NO_TRANSACTION, tsr.getTransactionStatus());
+        assertThat(tsr.getTransactionStatus()).isEqualTo(Status.STATUS_NO_TRANSACTION);
     }
 
+    @Test
     public void testTSR003() throws Exception {
         final TransactionSynchronizationRegistry tsr = TransactionSynchronizationRegistryFactory.getTransactionSynchronizationRegistry();
 
@@ -64,18 +74,19 @@ public class TransactionSynchronizationRegistryTest extends TransactionTestBundl
             tsr.putResource(key, value);
             
             final Object retrievedResource = tsr.getResource(key);
-            
-            assertTrue(value.equals(retrievedResource));
+
+            assertThat(value).isEqualTo(retrievedResource);
 
             tm.commit();
         }
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTSR004() throws Exception {
         final TransactionSynchronizationRegistry tsr = TransactionSynchronizationRegistryFactory.getTransactionSynchronizationRegistry();
 
@@ -83,17 +94,18 @@ public class TransactionSynchronizationRegistryTest extends TransactionTestBundl
         {
             tm.begin();
 
-            assertNotNull(tsr.getTransactionKey());
+            assertThat(tsr.getTransactionKey()).isNotNull();
 
             tm.commit();
         }
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTSR005() throws Exception {
         final TransactionSynchronizationRegistry tsr = TransactionSynchronizationRegistryFactory.getTransactionSynchronizationRegistry();
     
@@ -101,17 +113,18 @@ public class TransactionSynchronizationRegistryTest extends TransactionTestBundl
         {
             tm.begin();
     
-            assertEquals(Status.STATUS_ACTIVE, tsr.getTransactionStatus());
+            assertThat(tsr.getTransactionStatus()).isEqualTo(Status.STATUS_ACTIVE);
 
             tm.commit();
         }
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTSR006() throws Exception {
         final TransactionSynchronizationRegistry tsr = TransactionSynchronizationRegistryFactory.getTransactionSynchronizationRegistry();
     
@@ -125,15 +138,16 @@ public class TransactionSynchronizationRegistryTest extends TransactionTestBundl
 
             tm.commit();
 
-            assertFalse(!s.beforeCompletionCalled() || s.afterCompletionStatus() != Status.STATUS_COMMITTED);
+            assertThat(!s.beforeCompletionCalled() || s.afterCompletionStatus() != Status.STATUS_COMMITTED).isFalse();
         }
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTSR007() throws Exception {
         final TransactionSynchronizationRegistry tsr = TransactionSynchronizationRegistryFactory.getTransactionSynchronizationRegistry();
     
@@ -141,31 +155,19 @@ public class TransactionSynchronizationRegistryTest extends TransactionTestBundl
         {
             tm.begin();
 
-            assertFalse(tsr.getRollbackOnly());
+            assertThat(tsr.getRollbackOnly()).isFalse();
 
             tsr.setRollbackOnly();
 
-            assertFalse(!tsr.getRollbackOnly() || tsr.getTransactionStatus() != Status.STATUS_MARKED_ROLLBACK);
+            assertThat(!tsr.getRollbackOnly() || tsr.getTransactionStatus() != Status.STATUS_MARKED_ROLLBACK).isFalse();
         }
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        try
-        {
-            tm.commit();
-            fail();
-        }
-        catch (RollbackException e)
-        {
-            // As expected
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace(System.out);
-            fail();
-        }
+        assertThatExceptionOfType(RollbackException.class)
+        		.isThrownBy(() -> tm.commit());
     }
 }

@@ -18,9 +18,13 @@
 
 package org.osgi.test.cases.transaction;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.fail;
+
 import javax.transaction.RollbackException;
 
-import org.osgi.test.support.sleep.Sleep;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @version $Rev$ $Date$
@@ -34,22 +38,24 @@ public class LengthyTransactionManagerTest extends TransactionTestBundleControl 
     private static final int TOTAL_TRANSACTION_LIFETIME_TIMEOUT = 10;
     private static final int SUITABLE_DELAY = 5;
 
+    @BeforeEach
     public void setUp() throws Exception {
 		super.setUp();
         super.setUpTransactionManager();
     }
 
+    @Test
     public void testTM035() throws Exception {
         try
         {
             tm.setTransactionTimeout(TOTAL_TRANSACTION_LIFETIME_TIMEOUT);
             tm.begin();
-			Sleep.sleep(1000 * (TOTAL_TRANSACTION_LIFETIME_TIMEOUT - SUITABLE_DELAY));
+			Thread.sleep(1000 * (TOTAL_TRANSACTION_LIFETIME_TIMEOUT - SUITABLE_DELAY));
         }
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
         try
@@ -59,37 +65,26 @@ public class LengthyTransactionManagerTest extends TransactionTestBundleControl 
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testTM036() throws Exception {
         try
         {
             tm.setTransactionTimeout(TOTAL_TRANSACTION_LIFETIME_TIMEOUT);
             tm.begin();
-			Sleep.sleep(1000 * (TOTAL_TRANSACTION_LIFETIME_TIMEOUT + SUITABLE_DELAY));
+			Thread.sleep(1000 * (TOTAL_TRANSACTION_LIFETIME_TIMEOUT + SUITABLE_DELAY));
         }
         catch (Exception e)
         {
             e.printStackTrace(System.out);
-            fail();
+            fail("");
         }
 
-        try
-        {
-            tm.commit();
-            fail();
-        }
-        catch (RollbackException e)
-        {
-            // As expected
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace(System.out);
-            fail();
-        }
+        assertThatExceptionOfType(RollbackException.class)
+        		.isThrownBy(() -> tm.commit());
     }
 
 }

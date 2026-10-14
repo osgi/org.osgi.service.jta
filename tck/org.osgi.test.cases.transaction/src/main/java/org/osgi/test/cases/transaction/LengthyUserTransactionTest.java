@@ -18,9 +18,12 @@
 
 package org.osgi.test.cases.transaction;
 
+import static org.assertj.core.api.Assertions.fail;
+
 import javax.transaction.RollbackException;
 
-import org.osgi.test.support.sleep.Sleep;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @version $Rev$ $Date$
@@ -33,38 +36,41 @@ public class LengthyUserTransactionTest extends TransactionTestBundleControl {
     private static final int TOTAL_TRANSACTION_LIFETIME_TIMEOUT = 10;
     private static final int SUITABLE_DELAY = 5;
 
+    @BeforeEach
     public void setUp() throws Exception {
 		super.setUp();
         super.setUpUserTransaction();
     }
 
+    @Test
     public void testUT028() throws Exception {
         try
         {
             ut.setTransactionTimeout(TOTAL_TRANSACTION_LIFETIME_TIMEOUT);
             ut.begin();
 
-			Sleep.sleep(1000 * (TOTAL_TRANSACTION_LIFETIME_TIMEOUT - SUITABLE_DELAY));
+			Thread.sleep(1000 * (TOTAL_TRANSACTION_LIFETIME_TIMEOUT - SUITABLE_DELAY));
 
             ut.commit();
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 
+    @Test
     public void testUT029() throws Exception {
         try
         {
             ut.setTransactionTimeout(TOTAL_TRANSACTION_LIFETIME_TIMEOUT);
             ut.begin();
 
-			Sleep.sleep(1000 * (TOTAL_TRANSACTION_LIFETIME_TIMEOUT + SUITABLE_DELAY));
+			Thread.sleep(1000 * (TOTAL_TRANSACTION_LIFETIME_TIMEOUT + SUITABLE_DELAY));
 
             ut.commit();
-            fail();
+            fail("");
         }
         catch (RollbackException e)
         {
@@ -73,7 +79,7 @@ public class LengthyUserTransactionTest extends TransactionTestBundleControl {
         catch (Exception e)
         {
             e.printStackTrace();
-            fail();
+            fail("");
         }
     }
 }

@@ -17,14 +17,21 @@
  *******************************************************************************/
 package org.osgi.test.cases.transaction;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
 import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.osgi.framework.BundleContext;
 import org.osgi.test.cases.transaction.util.TransactionManagerFactory;
 import org.osgi.test.cases.transaction.util.TransactionSynchronizationRegistryFactory;
 import org.osgi.test.cases.transaction.util.TransactionUtil;
 import org.osgi.test.cases.transaction.util.UserTransactionFactory;
-import org.osgi.test.support.compatibility.DefaultTestBundleControl;
+import org.osgi.test.common.annotation.InjectBundleContext;
 
 /**
  * @version $Rev$ $Date$
@@ -35,19 +42,21 @@ import org.osgi.test.support.compatibility.DefaultTestBundleControl;
  * 
  *
  */
-public abstract class TransactionTestBundleControl extends DefaultTestBundleControl {
+public abstract class TransactionTestBundleControl {
+
+	@InjectBundleContext
+	BundleContext		context;
 
     private final int DEFAULTTIME = 30;
     static TransactionManager tm;
     static UserTransaction ut;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		TransactionManagerFactory.setBundleContext(getContext());
-		UserTransactionFactory.setBundleContext(getContext());
+	@BeforeEach
+	public void setUp() throws Exception {
+		TransactionManagerFactory.setBundleContext(context);
+		UserTransactionFactory.setBundleContext(context);
 		TransactionSynchronizationRegistryFactory
-				.setBundleContext(getContext());
+				.setBundleContext(context);
     }
 
     /*
@@ -58,7 +67,7 @@ public abstract class TransactionTestBundleControl extends DefaultTestBundleCont
             String p;
             int waitTime = DEFAULTTIME;
             // First check if the user has a preference.
-		p = getProperty("org.osgi.test.cases.transaction.waittime");
+		p = AccessController.doPrivileged((PrivilegedAction<String>) () -> context.getProperty("org.osgi.test.cases.transaction.waittime"));
             if (p != null) {
                 if (Integer.parseInt(p) > 0) {
                     waitTime = Integer.parseInt(p);
@@ -71,7 +80,7 @@ public abstract class TransactionTestBundleControl extends DefaultTestBundleCont
         if (tm == null) {
             tm = TransactionManagerFactory.getTransactionManager(getWaitTime());
         }
-        assertNotNull(tm);
+        assertThat(tm).isNotNull();
         TransactionUtil.startWithCleanTM(tm); 
     }
     
@@ -81,7 +90,7 @@ public abstract class TransactionTestBundleControl extends DefaultTestBundleCont
         if (ut == null) {
             ut = UserTransactionFactory.getUserTransaction(getWaitTime());
         }
-        assertNotNull(ut);
+        assertThat(ut).isNotNull();
         TransactionUtil.startWithCleanUT(ut); 
     }
 

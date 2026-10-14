@@ -22,7 +22,6 @@ import javax.transaction.TransactionManager;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.test.support.sleep.Sleep;
 
 /**
  * @version $Rev$ $Date$
@@ -63,7 +62,7 @@ public class TransactionManagerFactory {
                 // and try again
                 if (_tmRef == null) {
                     try {
-						Sleep.sleep(1000);
+						Thread.sleep(1000);
                     } catch (InterruptedException ie) {
                         ie.printStackTrace();
                     }
