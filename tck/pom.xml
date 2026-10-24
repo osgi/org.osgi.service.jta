@@ -15,7 +15,7 @@
 	<properties>
 		<geronimo-j2ee-connector_1.5_spec.version>2.0.0</geronimo-j2ee-connector_1.5_spec.version>
 		<geronimo-jta_1.1_spec.version>1.1.1</geronimo-jta_1.1_spec.version>
-		<geronimo-transaction.version>2.1.2</geronimo-transaction.version>
+		<geronimo-transaction.version>4.0.0</geronimo-transaction.version>
 		<org.eclipse.osgi.version>3.24.300</org.eclipse.osgi.version>
 		<org.osgi.framework.version>1.10.0</org.osgi.framework.version>
 		<slf4j.version>2.0.20</slf4j.version>
